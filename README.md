@@ -28,6 +28,12 @@ juger la justesse des réponses sans m'auto-tromper. C'est une condition d'une
                                 └─── rag/generate.py   (usage)
                                              │
                              question ──▶ rerank ──▶ contexte + LLM ──▶ réponse + sources
+                                             ▲
+                                             │  (mêmes appels Python)
+                                             │
+                                    api/main.py  (FastAPI)
+                                    GET /health, POST /ask
+                                    ← consommé par un front séparé (React, curl, requests…)
 ```
 
 **Flux de données**
@@ -56,8 +62,10 @@ farag/
 │   └── gold/
 │       ├── gold.jsonl   # paires question/passage
 │       └── README.md
-└── rag/
-    └── generate.py      # RAG génération + CLI
+├── rag/
+│   └── generate.py      # RAG génération + CLI
+└── api/
+    └── main.py          # backend FastAPI (GET /health, POST /ask)
 ```
 
 ## Décisions de conception notables
@@ -182,7 +190,8 @@ items faux.
 # installer les dépendances (cf. section Dépendances)
 pip3 install docling==2.9.0 docling-core==2.19.1 \
              sentence-transformers==3.4.1 tf-keras \
-             openai python-dotenv
+             openai python-dotenv \
+             fastapi uvicorn
 
 # renseigner la clé dans .env à la racine
 echo "OPENAI_API_KEY=sk-..." > .env
@@ -258,6 +267,75 @@ python3 -m rag.generate "Quelle est la capitale de l'Australie ?"   # → refus,
 Sortie : réponse rédigée + `Sources :` (doc_id, section, pages). Sur une
 question hors corpus, la phrase de refus exacte est renvoyée sans sources.
 
+**API HTTP (backend FastAPI)**
+
+Le pipeline est aussi exposé derrière une API JSON, prête à être consommée par
+un front séparé (React, curl, `requests`, etc.). Elle appelle exactement les
+mêmes fonctions Python que le CLI — pas de duplication de logique.
+
+Démarrer le serveur (depuis la racine du projet) :
+
+```bash
+python3 -m uvicorn api.main:app --port 8000
+# attendre la ligne "Retrievers prêts." (chargement e5 + bge, quelques dizaines de secondes)
+```
+
+Le serveur charge les chunks et instancie `DenseRetriever` + `RerankRetriever`
+**une seule fois** dans son `lifespan` — les requêtes suivantes réutilisent les
+modèles en mémoire.
+
+Endpoints :
+
+- `GET /health` → `{"status":"ok","chunks_loaded":N}`. Utile pour vérifier que
+  le serveur est prêt avant d'interroger.
+- `POST /ask` — corps JSON :
+  ```json
+  { "question": "...", "mode": "dense" | "rerank" }
+  ```
+  réponse JSON :
+  ```json
+  {
+    "answer": "...",
+    "sources": [ { "doc_id": "...", "section_path": "A > B", "pages": [1,2] } ],
+    "mode_used": "dense" | "rerank",
+    "elapsed_ms": 3210
+  }
+  ```
+  Validation stricte : question vide ou mode invalide → HTTP 422 avec message
+  clair. Erreur OpenAI (clé absente, rate limit, réseau) → HTTP 503 avec
+  `{"error": "..."}`, jamais de traceback brut. Question hors corpus → phrase
+  de refus + `sources: []`.
+
+CORS activé en dev pour tout `localhost` / `127.0.0.1` (n'importe quel port),
+pour brancher un front Vite/CRA sans configuration.
+
+Trois façons pratiques d'interroger :
+
+1. **Swagger auto** : ouvre `http://127.0.0.1:8000/docs` dans le navigateur.
+   Interface interactive : "Try it out" → tape le JSON → "Execute".
+2. **curl** :
+   ```bash
+   curl -s -X POST http://127.0.0.1:8000/ask \
+     -H 'Content-Type: application/json' \
+     -d '{"question":"Quel équipement en UMTS joue le rôle du BSC en GSM ?","mode":"rerank"}' \
+     | python3 -m json.tool
+   ```
+3. **Python** (`pip3 install requests`) :
+   ```python
+   import requests
+   r = requests.post(
+       "http://127.0.0.1:8000/ask",
+       json={"question": "Ma question", "mode": "rerank"},
+   )
+   data = r.json()
+   print(data["answer"])
+   for i, s in enumerate(data["sources"], 1):
+       print(f"  [{i}] {s['doc_id']} · {s['section_path']} · p. {s['pages']}")
+   print(f"({data['elapsed_ms']} ms · mode={data['mode_used']})")
+   ```
+
+Note : `mode=dense` répond en ~3 s, `mode=rerank` en ~9 s sur CPU (cf. Limites).
+
 ## Limites & backlog assumés
 
 - **Reranking lent sur CPU (~5,5 s/requête)**. Contrainte matérielle : macOS 13,
@@ -293,6 +371,7 @@ Ingestion : `docling==2.9.0`, `docling-parse==2.1.2`, `docling-core==2.19.1`
 Retrieval : `sentence-transformers==3.4.1`, `torch`, `tf-keras` (shim de
 compatibilité pour `transformers`).
 Génération : `openai>=2`, `python-dotenv`.
+API : `fastapi`, `uvicorn`.
 
 Modèles téléchargés au premier run (mis en cache dans `~/.cache/huggingface/`) :
 `intfloat/multilingual-e5-small` (~470 MB), `BAAI/bge-reranker-v2-m3` (~2 GB),
