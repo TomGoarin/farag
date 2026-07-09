@@ -1,0 +1,29 @@
+# Dépendances backend Python.
+# Note : sur macOS arm64 + Python 3.12, seules ces versions de la stack docling
+# ont des wheels prébuilts (les versions supérieures exigent une compilation
+# C++ qui échoue). Ne pas relever sans changer d'environnement.
+
+# ---- Ingestion (parsing PDF/DOCX/images) -------------------------------------
+docling==2.9.0
+docling-parse==2.1.2
+docling-core==2.19.1
+easyocr==1.7.2
+
+# ---- Retrieval (embeddings + reranking) -------------------------------------
+sentence-transformers==3.4.1
+transformers==4.57.6
+tf-keras==2.21.0  # shim de compat pour transformers (Keras 3 incompatible)
+torch==2.11.0
+numpy>=2.0
+
+# ---- Génération (LLM OpenAI) -------------------------------------------------
+openai>=2
+python-dotenv>=1
+
+# ---- API backend -------------------------------------------------------------
+fastapi>=0.115
+uvicorn>=0.30
+pydantic>=2
+
+# ---- Divers (déjà tiré transitivement mais explicité) ------------------------
+certifi>=2024

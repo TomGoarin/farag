@@ -182,20 +182,85 @@ trouvable dans son `doc_id`) et exclut proprement ceux qui ne le sont pas, avec
 un rapport d'erreur — pas de plantage silencieux, pas de score gonflé par des
 items faux.
 
-## Utilisation
+## Installation & lancement
 
-**Setup**
+**1. Prérequis**
+
+- **Python 3.12** (les wheels docling pinnées ne sont dispos que pour cette
+  version sur macOS arm64).
+- **Node.js 18+** (pour le front Vite).
+- Une **clé API OpenAI** (`sk-…`) pour la génération.
+
+**2. Cloner + backend Python**
 
 ```bash
-# installer les dépendances (cf. section Dépendances)
-pip3 install docling==2.9.0 docling-core==2.19.1 \
-             sentence-transformers==3.4.1 tf-keras \
-             openai python-dotenv \
-             fastapi uvicorn
+git clone https://github.com/TomGoarin/farag.git
+cd farag
 
-# renseigner la clé dans .env à la racine
-echo "OPENAI_API_KEY=sk-..." > .env
+# environnement virtuel (recommandé pour ne pas polluer le Python système)
+python3 -m venv .venv
+source .venv/bin/activate    # sous macOS/Linux
+
+pip install -r requirements.txt
 ```
+
+Le premier lancement téléchargera les modèles (~470 MB pour e5-small, ~2 GB
+pour bge-reranker-v2-m3), mis en cache dans `~/.cache/huggingface/`.
+
+**3. Frontend**
+
+```bash
+cd frontend
+npm install
+cd ..
+```
+
+**4. Clé OpenAI**
+
+Deux options :
+
+```bash
+# option A — .env à la racine du repo (préférée, chargée automatiquement)
+echo "OPENAI_API_KEY=sk-..." > .env
+
+# option B — export shell
+export OPENAI_API_KEY=sk-...
+```
+
+Le `.env` est dans `.gitignore`, il ne sera jamais commité.
+
+**5. Lancement (deux terminaux)**
+
+```bash
+# terminal 1 — backend FastAPI
+./run-backend.sh
+# → http://127.0.0.1:8000  (doc auto : http://127.0.0.1:8000/docs)
+
+# terminal 2 — frontend Vite
+./run-frontend.sh
+# → http://localhost:5173
+```
+
+Chaque script tourne au premier plan dans son terminal (Ctrl+C pour arrêter,
+indépendamment l'un de l'autre). Sur une première installation, marquer les
+scripts exécutables si nécessaire : `chmod +x run-backend.sh run-frontend.sh`.
+
+**6. Vérifier que le backend est prêt**
+
+Les modèles mettent quelques dizaines de secondes à charger au démarrage.
+Avant de poser la première question :
+
+```bash
+curl http://127.0.0.1:8000/health
+# → {"status":"ok","chunks_loaded":N}
+```
+
+Un `chunks_loaded > 0` signifie que retriever et corpus sont en mémoire. Si tu
+n'as pas encore ingéré de documents, `N=0` — dépose des PDF/DOCX/images dans
+`data/raw/` puis lance `python3 ingest_corpus.py` (voir section Utilisation
+ci-dessous).
+
+## Utilisation
 
 **Ingestion**
 
