@@ -42,7 +42,7 @@ export default function App() {
   return (
     <main className="app">
       <header className="app-header">
-        <h1>farag — RAG</h1>
+        <h1>RastaFaRAG</h1>
         <p className="app-tagline">
           Réponses sourcées sur le corpus. Rien d'inventé hors contexte.
         </p>

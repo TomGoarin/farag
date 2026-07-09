@@ -80,7 +80,7 @@ def _build_sources(chunks: list[Chunk]) -> list[dict]:
 def answer(
     question: str,
     retriever,
-    k: int = 5,
+    k: int = 3,
     model: str = "gpt-4o-mini",
 ) -> dict:
     """Retrieval → prompt → génération. Retourne
@@ -131,7 +131,7 @@ def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser(description="RAG: question → réponse sourcée.")
     ap.add_argument("question", help="Question à poser")
     ap.add_argument("--chunks", default="data/chunks", help="Dossier des chunks")
-    ap.add_argument("--k", type=int, default=5, help="Nb de chunks à retrouver")
+    ap.add_argument("--k", type=int, default=3, help="Nb de chunks à retrouver")
     ap.add_argument("--model", default="gpt-4o-mini")
     ap.add_argument(
         "--retriever",

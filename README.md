@@ -363,6 +363,11 @@ Note : `mode=dense` répond en ~3 s, `mode=rerank` en ~9 s sur CPU (cf. Limites)
 - **OCR = texte seulement**. EasyOCR récupère le texte des scans et images,
   mais rien de la sémantique des figures (schémas, diagrammes). Qualité
   variable selon la qualité du document source.
+- **Sélection des sources**. Le nombre de passages fournis à la génération est
+  actuellement fixe (`k=3`). Une amélioration prévue est un filtrage par
+  **score de pertinence du reranker** (seuil), qui adapterait dynamiquement le
+  nombre de sources retenues et gérerait proprement les questions à couverture
+  large ou hors-corpus, au lieu d'un k constant.
 
 ## Dépendances
 

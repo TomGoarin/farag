@@ -171,7 +171,10 @@ def ask(req: AskRequest):
         raise HTTPException(status_code=503, detail={"error": "retriever non initialisé"})
 
     t0 = time.perf_counter()
-    result = answer(req.question, retriever, k=5)
+    # k = nombre de chunks fournis à la génération ET listés comme sources
+    # (invariant : contexte du LLM == sources affichées). Distinct du k du
+    # harnais recall@k, qui reste plus large côté eval.
+    result = answer(req.question, retriever, k=3)
     elapsed_ms = int((time.perf_counter() - t0) * 1000)
 
     # `answer()` avale les erreurs OpenAI et injecte un message préfixé.
