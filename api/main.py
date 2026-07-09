@@ -106,6 +106,7 @@ class AskRequest(BaseModel):
 
 class SourceOut(BaseModel):
     doc_id: str
+    source_file: str
     section_path: str
     pages: list[int]
 
@@ -134,13 +135,14 @@ _API_ERROR_PREFIX = "[erreur API OpenAI]"
 
 def _format_section(sp) -> str:
     if not sp:
-        return "(racine)"
+        return ""
     return " > ".join(sp)
 
 
 def _to_source_out(src: dict) -> SourceOut:
     return SourceOut(
         doc_id=src["doc_id"],
+        source_file=src.get("source_file", ""),
         section_path=_format_section(src.get("section_path", [])),
         pages=list(src.get("pages", [])),
     )

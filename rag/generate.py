@@ -71,6 +71,7 @@ def _build_sources(chunks: list[Chunk]) -> list[dict]:
         seen.add(key)
         sources.append({
             "doc_id": c.doc_id,
+            "source_file": Path(c.source_file).name,  # basename, jamais le chemin
             "section_path": list(c.section_path),
             "pages": list(c.pages),
         })
@@ -122,9 +123,12 @@ def answer(
 # ---------------------------------------------------------------------------
 
 def _fmt_source(idx: int, src: dict) -> str:
-    section = " > ".join(src["section_path"]) if src["section_path"] else "(racine)"
-    pages = f" · p. {src['pages']}" if src["pages"] else ""
-    return f"  [{idx}] {src['doc_id']} · {section}{pages}"
+    parts = [src.get("source_file") or src["doc_id"]]
+    if src.get("section_path"):
+        parts.append(" > ".join(src["section_path"]))
+    if src.get("pages"):
+        parts.append(f"p. {', '.join(str(p) for p in src['pages'])}")
+    return f"  [{idx}] " + " · ".join(parts)
 
 
 def main(argv: list[str] | None = None) -> int:

@@ -348,7 +348,8 @@ body {
 
 .sources-list {
   margin: 0;
-  padding-left: 1.4rem;
+  padding-left: 0;
+  list-style: none;             /* le [n] du composant Source fait office de repère */
   font-size: 0.92rem;
   color: var(--ink-soft);
 }
@@ -363,10 +364,9 @@ body {
   margin-right: 0.35rem;
 }
 
-.source-doc-id {
-  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
-  color: var(--ink-soft);
-  font-size: 0.9em;
+.source-doc {
+  color: var(--ink);
+  font-weight: 600;
 }
 
 .source-section {
