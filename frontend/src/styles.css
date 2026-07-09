@@ -1,0 +1,225 @@
+/* Styles minimaux : lisibilité, pas de thème. Classes sémantiques prêtes à
+   accueillir un vrai styling plus tard. */
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+  color: #1a1a1a;
+  background: #fafafa;
+  line-height: 1.5;
+}
+
+.app {
+  max-width: 780px;
+  margin: 0 auto;
+  padding: 2rem 1.25rem 4rem;
+}
+
+.app-header h1 {
+  margin: 0 0 0.25rem;
+  font-size: 1.75rem;
+}
+
+.app-tagline {
+  margin: 0 0 2rem;
+  color: #555;
+  font-size: 0.95rem;
+}
+
+/* ---------- Form ---------- */
+
+.ask-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  margin-bottom: 2rem;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.field-label {
+  font-weight: 600;
+  font-size: 0.95rem;
+}
+
+.field-hint {
+  font-weight: 400;
+  color: #666;
+  font-size: 0.85rem;
+}
+
+.question-input {
+  width: 100%;
+  padding: 0.6rem 0.7rem;
+  font: inherit;
+  border: 1px solid #cfcfcf;
+  border-radius: 4px;
+  resize: vertical;
+}
+
+.question-input:focus {
+  outline: 2px solid #4a90e2;
+  outline-offset: -1px;
+}
+
+.mode-field {
+  border: 1px solid #e4e4e4;
+  border-radius: 4px;
+  padding: 0.6rem 0.75rem;
+  margin: 0;
+}
+
+.mode-field[disabled] {
+  opacity: 0.7;
+}
+
+.mode-option {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  margin-right: 1rem;
+  cursor: pointer;
+}
+
+.mode-option input {
+  cursor: pointer;
+}
+
+.submit-btn {
+  align-self: flex-start;
+  padding: 0.55rem 1.1rem;
+  font: inherit;
+  font-weight: 600;
+  color: #fff;
+  background: #2b6cb0;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.submit-btn:hover:not(:disabled) {
+  background: #1e5288;
+}
+
+.submit-btn:disabled {
+  background: #9db3c9;
+  cursor: not-allowed;
+}
+
+/* ---------- Result zone ---------- */
+
+.result-zone {
+  min-height: 4rem;
+}
+
+.loading {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  color: #444;
+}
+
+.loading-hint {
+  color: #777;
+  font-style: italic;
+}
+
+.spinner {
+  width: 16px;
+  height: 16px;
+  border: 2px solid #cfcfcf;
+  border-top-color: #2b6cb0;
+  border-radius: 50%;
+  animation: spin 0.9s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.error {
+  padding: 0.75rem 0.9rem;
+  background: #fdecea;
+  border: 1px solid #f5b7b1;
+  border-radius: 4px;
+  color: #7b1f1f;
+}
+
+.answer-block {
+  padding: 1rem 1.15rem;
+  background: #fff;
+  border: 1px solid #e0e0e0;
+  border-radius: 6px;
+}
+
+.answer-heading {
+  margin: 0 0 0.5rem;
+  font-size: 1.05rem;
+  color: #333;
+}
+
+.answer-text {
+  margin: 0 0 0.8rem;
+  font-size: 1.05rem;
+  white-space: pre-wrap;
+}
+
+.meta {
+  margin: 0 0 1rem;
+  color: #666;
+  font-size: 0.85rem;
+}
+
+.meta code {
+  background: #f0f0f0;
+  padding: 0 0.3em;
+  border-radius: 3px;
+}
+
+/* ---------- Sources ---------- */
+
+.sources-block {
+  border-top: 1px solid #ececec;
+  padding-top: 0.75rem;
+}
+
+.sources-heading {
+  margin: 0 0 0.5rem;
+  font-size: 0.95rem;
+  color: #333;
+}
+
+.sources-list {
+  margin: 0;
+  padding-left: 1.25rem;
+  font-size: 0.9rem;
+  color: #333;
+}
+
+.source {
+  margin-bottom: 0.25rem;
+}
+
+.source-index {
+  color: #888;
+  margin-right: 0.35rem;
+}
+
+.source-doc-id {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  color: #555;
+}
+
+.source-sep {
+  color: #aaa;
+}
