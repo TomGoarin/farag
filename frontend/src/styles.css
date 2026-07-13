@@ -238,20 +238,39 @@ body {
   min-height: 4rem;
 }
 
-/* --- Loading -------------------------------------------------------------- */
+/* --- Loading (skeleton) --------------------------------------------------- */
 
-.loading {
-  display: flex;
-  align-items: center;
-  gap: 0.7rem;
-  padding: 1rem 1.15rem;
-  background: var(--card-bg);
-  backdrop-filter: blur(14px) saturate(140%);
-  -webkit-backdrop-filter: blur(14px) saturate(140%);
-  border: 1px solid var(--card-border);
-  border-radius: var(--r-md);
-  box-shadow: var(--card-shadow);
-  color: var(--ink-soft);
+/* Le bloc parent réutilise .answer-block pour éviter tout saut de layout à la
+   transition skeleton → contenu réel. Les barres ci-dessous sont animées en
+   shimmer. */
+
+.skeleton-block {
+  /* .answer-block fournit fond, bordure, ombre, arrondi — on garde tel quel. */
+}
+
+.skeleton-line {
+  height: 14px;
+  margin: 0 0 0.65rem;
+  border-radius: 7px;
+  background:
+    linear-gradient(90deg,
+      rgba(198, 228, 245, 0.45) 0%,
+      rgba(255, 255, 255, 0.85) 50%,
+      rgba(198, 228, 245, 0.45) 100%);
+  background-size: 200% 100%;
+  animation: shimmer 1.6s ease-in-out infinite;
+}
+
+.skeleton-source {
+  height: 11px;
+  margin-bottom: 0.5rem;
+  opacity: 0.85;
+}
+
+.skeleton-status {
+  margin: 0.6rem 0 1.1rem;
+  color: var(--ink-muted);
+  font-size: 0.9rem;
 }
 
 .loading-hint {
@@ -259,18 +278,19 @@ body {
   font-style: italic;
 }
 
-.spinner {
-  width: 18px;
-  height: 18px;
-  border: 2.5px solid rgba(41, 163, 217, 0.2);
-  border-top-color: var(--cyan);
-  border-radius: 50%;
-  animation: spin 0.9s linear infinite;
+@keyframes shimmer {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
 }
 
-@keyframes spin {
-  to {
-    transform: rotate(360deg);
+@media (prefers-reduced-motion: reduce) {
+  .skeleton-line {
+    animation: none;
+    background: rgba(198, 228, 245, 0.6);
   }
 }
 

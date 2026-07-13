@@ -93,9 +93,17 @@ export default function App() {
 
       <section className="result-zone" aria-live="polite">
         {status === "loading" && (
-          <div className="loading">
-            <span className="spinner" aria-hidden="true" />
-            <span className="loading-text">
+          <div
+            className="answer-block skeleton-block"
+            aria-busy="true"
+            aria-label="Chargement de la réponse en cours"
+          >
+            <h2 className="answer-heading">Réponse</h2>
+            <div className="skeleton-line" style={{ width: "94%" }} />
+            <div className="skeleton-line" style={{ width: "88%" }} />
+            <div className="skeleton-line" style={{ width: "72%" }} />
+
+            <p className="skeleton-status">
               Recherche et génération en cours…
               {mode === "rerank" && (
                 <em className="loading-hint">
@@ -103,7 +111,14 @@ export default function App() {
                   (le mode rerank peut prendre ~10 s sur CPU)
                 </em>
               )}
-            </span>
+            </p>
+
+            <div className="sources-block">
+              <h3 className="sources-heading">Sources</h3>
+              <div className="skeleton-line skeleton-source" style={{ width: "62%" }} />
+              <div className="skeleton-line skeleton-source" style={{ width: "56%" }} />
+              <div className="skeleton-line skeleton-source" style={{ width: "48%" }} />
+            </div>
           </div>
         )}
 
